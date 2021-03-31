@@ -5,50 +5,42 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity() {
     lateinit var tvCounter: EditText
     lateinit var btnData: Button
     lateinit var btnShow: Button
-
-    var counter: Int = 0
+    lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initData()
-        initCounter()
         initClick()
-
-        validateCounter()
-    }
-
-    private fun validateCounter() {
-        if (counter > 5) {
-            counter = 0
-        }
     }
 
     private fun initData() {
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
         tvCounter = findViewById(R.id.tvCounter)
         btnData = findViewById(R.id.btnData)
         btnShow = findViewById(R.id.btnShow)
-    }
 
-    private fun initCounter() {
-        tvCounter.setText(counter.toString())
+        mainViewModel.mldCounter.observe(this, Observer { value ->
+            tvCounter.setText(value)
+        })
     }
 
     private fun initClick() {
         btnData.setOnClickListener {
-            counter++
-            validateCounter()
-            initCounter()
+            mainViewModel.incrementCounter()
         }
 
         btnShow.setOnClickListener {
-            Toast.makeText(this, "Contador: ${counter.toString()}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Contador: ${mainViewModel.mldCounter.value}", Toast.LENGTH_SHORT).show()
         }
     }
 }
